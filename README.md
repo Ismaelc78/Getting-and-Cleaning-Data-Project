@@ -22,24 +22,22 @@ It also contained 10,299 observations.
     **library(tidyverse)** was used.
     
 
-**To reach the goals in the project I did the following:**
+**Some things I learned along the way:**
 
 The use of **read.delim2("X_train.txt", header = FALSE, sep = "", dec = ",")** to read in text files and separate the values appropriately. 
 
-From exploring the data, I noticed the column names were in another txt.file as a column, so I had to reshape them as the names for the dataset.
-I used **names(TrainX) <- Features$V2** to appropriately name the headers/values for the DF. 
 
+I applied  **grepl()**  to produce variables that contained the characters "mean" or "std". 
 
-I applied  **grepl()**  to produce variables that contained the characters "mean" or "std" . 
 **HAdf<- cbind(HumanActivity$ID, HumanActivity$Activity,HumanActivity[ , grepl( "mean" , names( HumanActivity ) ) ],HumanActivity[ , grepl( "std" , names( HumanActivity ) ) ] )**
 
-Then I nested **ifelse()** statements to turn the activity values to their corresponding activities (1== Walking, 6 == Laying, etc.)
 
 The most challenging aspect was meeting goal #7. Where I had to produce the average of each variable for each activity AND each subject. I wasn't sure how to group by 2 different variables at the same time. Eventually I found out how to do it by using the **group_by()** and **summarise_all()** functions. 
 
 Example:
 
 **TidyDF <- TidyDF %>% group_by(ID, Activity) %>% summarise_all(funs(mean) )**
+
 
 In the end, I took a while but learned a few things:
 
