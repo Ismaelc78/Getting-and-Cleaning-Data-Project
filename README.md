@@ -1,13 +1,13 @@
 # Getting-and-Cleaning-Data-Project
 **The purpose of the project was to practice my data tidying skills.**
 
-This data used contains gravitational movement measurements performed on various people using smartphone accelerometers. It was used to advance research in wearable computing. 
-
-Gathered .txt files from http://archive.ics.uci.edu/ml/datasets/Human+Activity+Recognition+Using+Smartphones
+The data used contains gravitational movement measurements performed on various people using smartphone accelerometers. 30 indivduals perfomred 6 activies (Walking, Standing, Walking-Upstairs, Walking-Downstiars, Laying, Sitting), while being monitored. 
 
 There was a Test and a Train folder with separate files that all had to be merged accordingly. 
 For the variables/columns, it contained 560 quantitative measures, an ID for the subjects, and the Activity performed.
 It also contained 10,299 observations.
+
+In the end, the output file is the mean of all measurements, grouped by aactivity and subject. It comes down to 81 columns and 180 observations. 
 
 **My goals were:**
 
@@ -19,24 +19,75 @@ It also contained 10,299 observations.
 6.	Appropriately labels the data set with descriptive variable names.
 7.	Create a second, independent tidy data set with the average of each variable for each activity and each subject.
 
-    **library(tidyverse)** was used.
     
 
 **Some things I learned along the way:**
 
-The use of **read.delim2("X_train.txt", header = FALSE, sep = "", dec = ",")** to read in text files and separate the values appropriately. 
+** Libraries **
+library(tidyverse)
+library(dplyr)
+
+**Read in X-train , y_train, and subject for the Train set. 
+txt = tab delimited text. 
+ Use (..sep = "  ", ...) to separate the values into their own column. **
+
+TrainX<-read.delim2("X_train.txt", header = FALSE, sep = "", dec = ",")
+TrainY<-read.delim2("y_train.txt", header = FALSE, sep = "", dec = ",")
+Subjects<-read.delim2("subject_train.txt", header = FALSE, sep = "", dec = ",")
+Features <- read.delim2("features.txt", header = FALSE, sep = "", dec = ",")
 
 
-I applied  **grepl()**  to produce variables that contained the characters "mean" or "std". 
+**Now we need to make Features into the header. Used the 2nd col as col. names for TrainSet.**
+names(TrainX) <- Features$V2
 
-**HAdf<- cbind(HumanActivity$ID, HumanActivity$Activity,HumanActivity[ , grepl( "mean" , names( HumanActivity ) ) ],HumanActivity[ , grepl( "std" , names( HumanActivity ) ) ] )**
+**Combine Subjects and TrainY df**
+ID <- cbind(Subjects, TrainY)
 
+**Now we need to make Col Names for ID**
+names(ID) <- c("ID", "Activity")
 
-The most challenging aspect was meeting goal #7. Where I had to produce the average of each variable for each activity AND each subject. I wasn't sure how to group by 2 different variables at the same time. Eventually I found out how to do it by using the **group_by()** and **summarise_all()** functions. 
+**Now I can bind ID with the TrainSet**
+TrainSet <- cbind(ID, TrainX)
 
-Example:
+**------------------- Same for Test Set**
 
-**TidyDF <- TidyDF %>% group_by(ID, Activity) %>% summarise_all(funs(mean) )**
+Subject <-read.delim2("subject_test.txt", header = FALSE, sep = "", dec = ",")
+TestX <-read.delim2("X_test.txt", header = FALSE, sep = "", dec = ",")
+TestY <-read.delim2("y_test.txt", header = FALSE, sep = "", dec = ",")
+
+**Combine Subject, TrainY, and TestY in that order. Same order as the Train Set**
+TestSet <- cbind(Subject, TestY, TestX)
+
+**Make the TestSet column names the same as the TrainSet for a smooth row bind.** 
+names(TestSet)<- names(TrainSet)
+HumanActivity <- rbind(TrainSet, TestSet)
+
+**Only keep variables that are MEAN and STD.**
+HAdf<- cbind(HumanActivity$ID, HumanActivity$Activity,HumanActivity[ , grepl( "mean" , names( HumanActivity ) ) ],HumanActivity[ , grepl( "std" , names( HumanActivity ) ) ] )
+HAdf <- rename(HAdf, ID = 'HumanActivity$ID',Activity = 'HumanActivity$Activity' )
+
+**Change the Activity numbers into their descriptions ( Walking, Laying, etc. )**
+HAdf$Activity <- ifelse(HumanActivity$Activity == 1, "WALKING",
+                        ifelse(HumanActivity$Activity == 2,"Walking_Upstairs", 
+                               ifelse(HumanActivity$Activity == 3, "Walking_Downstairs", 
+                                      ifelse(HumanActivity$Activity == 4, "Sitting",
+                                             ifelse(HumanActivity$Activity == 5, "Standing", "Laying")
+                                      ))))
+
+**Next we want to find the mean for each variable grouped by the ID and Activity 
+First, we need to make sure the df is in numeric form.**
+
+TidyDF<- as.data.frame(sapply(HAdf, as.numeric))
+
+**Since the "HAan" is numeric, the $Activity is now NA. Will move the old column to the new df.**
+TidyDF$Activity <- HAdf$Activity
+
+**Now we will find the mean for each variable grouped by the ID and Activity**
+TidyDF <- TidyDF %>% group_by(ID, Activity) %>% summarise_all(funs(mean) )
+
+**Our data is Tidy.**
+dim(TidyDF)
+view(TidyDF)
 
 
 In the end, I took a while but learned a few things:
