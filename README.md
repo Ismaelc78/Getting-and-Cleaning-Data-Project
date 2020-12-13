@@ -30,8 +30,9 @@ library(tidyverse)
 library(dplyr)
 
 **Read in X-train , y_train, and subject for the Train set. 
-txt = tab delimited text. 
- Use (..sep = "  ", ...) to separate the values into their own column. **
+txt = tab delimited text.** 
+
+**Use (..sep = "  ", ...) to separate the values into their own column. **
 
 
 TrainX<-read.delim2("X_train.txt", header = FALSE, sep = "", dec = ",")
