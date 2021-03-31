@@ -7,13 +7,29 @@ There was a Test and a Train folder with separate files that all had to be merge
 For the variables/columns, it contained 560 quantitative measures, an ID for the subjects, and the Activity performed.
 It also contained 10,299 observations.
 
+**Data-Files**
+
+X-Train
+
+Y-Train
+
+X-Test
+
+Y-Test
+
+Features (activity features)
+
+Subjects (ID for each indivudal person)
+
+README- Labels
+
 In the end, the output file is the mean of all measurements, grouped by activity and subject. It comes down to 81 columns and 180 observations. 
 
 **My goals were:**
 
 1.	To gather the data using R.
 2.	Explore the data and README.
-3.	Find out how to merge it accordingly.
+3.	Find out how to merge it accordingly. This included mearging the X and Y files, ID's for each person, labels for the activty, and activty features all together.  
 4.	Extracts only the measurements on the mean and standard deviation for each measurement.
 5.	Uses descriptive activity names to label the activities in the data set. (Walking, Laying, etc.)
 6.	Appropriately labels the data set with descriptive variable names.
@@ -31,7 +47,7 @@ library(dplyr)
 
 ----------------------------------------------------------------
 
-**Read in X-train , y_train, and subject for the Train set. 
+**Read in X-train , Y_train, and subject for the Train set. 
 txt = tab delimited text.** 
 
 **Use (..sep = "  ", ...) to separate the values into their own column. **
@@ -46,7 +62,7 @@ Subjects<-read.delim2("subject_train.txt", header = FALSE, sep = "", dec = ",")
 Features <- read.delim2("features.txt", header = FALSE, sep = "", dec = ",")
 
 
-**Now we need to make Features into the header. Used the 2nd col as col. names for TrainSet.**
+**After exploring Features, I knew I wanted to get the 2nd col in Features and make it into the col names for the TrainSet. Used the 2nd col as col. names for TrainSet.**
 
 names(TrainX) <- Features$V2
 
@@ -86,7 +102,7 @@ HAdf<- cbind(HumanActivity$ID, HumanActivity$Activity,HumanActivity[ , grepl( "m
 
 HAdf <- rename(HAdf, ID = 'HumanActivity$ID',Activity = 'HumanActivity$Activity' )
 
-**Change the Activity numbers into their descriptions ( Walking, Laying, etc. )**
+**The data contained numbers for the type of activty the subject performed. I changed the Activity numbers into their descriptions according to the README ( 1=Walking, 2=Laying, etc. )**
 
 HAdf$Activity <- ifelse(HumanActivity$Activity == 1, "WALKING",
                       
