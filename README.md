@@ -7,7 +7,7 @@ There was a Test and a Train folder with separate files that all had to be merge
 For the variables/columns, it contained 560 quantitative measures, an ID for the subjects, and the Activity performed.
 It also contained 10,299 observations.
 
-In the end, the output file is the mean of all measurements, grouped by aactivity and subject. It comes down to 81 columns and 180 observations. 
+In the end, the output file is the mean of all measurements, grouped by activity and subject. It comes down to 81 columns and 180 observations. 
 
 **My goals were:**
 
@@ -29,6 +29,8 @@ library(tidyverse)
 
 library(dplyr)
 
+----------------------------------------------------------------
+
 **Read in X-train , y_train, and subject for the Train set. 
 txt = tab delimited text.** 
 
@@ -36,8 +38,11 @@ txt = tab delimited text.**
 
 
 TrainX<-read.delim2("X_train.txt", header = FALSE, sep = "", dec = ",")
+
 TrainY<-read.delim2("y_train.txt", header = FALSE, sep = "", dec = ",")
+
 Subjects<-read.delim2("subject_train.txt", header = FALSE, sep = "", dec = ",")
+
 Features <- read.delim2("features.txt", header = FALSE, sep = "", dec = ",")
 
 
@@ -60,7 +65,9 @@ TrainSet <- cbind(ID, TrainX)
 **------------------- Same for Test Set**
 
 Subject <-read.delim2("subject_test.txt", header = FALSE, sep = "", dec = ",")
+
 TestX <-read.delim2("X_test.txt", header = FALSE, sep = "", dec = ",")
+
 TestY <-read.delim2("y_test.txt", header = FALSE, sep = "", dec = ",")
 
 **Combine Subject, TrainY, and TestY in that order. Same order as the Train Set**
@@ -70,21 +77,28 @@ TestSet <- cbind(Subject, TestY, TestX)
 **Make the TestSet column names the same as the TrainSet for a smooth row bind.** 
 
 names(TestSet)<- names(TrainSet)
+
 HumanActivity <- rbind(TrainSet, TestSet)
 
 **Only keep variables that are MEAN and STD.**
 
 HAdf<- cbind(HumanActivity$ID, HumanActivity$Activity,HumanActivity[ , grepl( "mean" , names( HumanActivity ) ) ],HumanActivity[ , grepl( "std" , names( HumanActivity ) ) ] )
+
 HAdf <- rename(HAdf, ID = 'HumanActivity$ID',Activity = 'HumanActivity$Activity' )
 
 **Change the Activity numbers into their descriptions ( Walking, Laying, etc. )**
 
 HAdf$Activity <- ifelse(HumanActivity$Activity == 1, "WALKING",
-                        ifelse(HumanActivity$Activity == 2,"Walking_Upstairs", 
-                               ifelse(HumanActivity$Activity == 3, "Walking_Downstairs", 
-                                      ifelse(HumanActivity$Activity == 4, "Sitting",
-                                             ifelse(HumanActivity$Activity == 5, "Standing", "Laying")
-                                      ))))
+                      
+                      ifelse(HumanActivity$Activity == 2,"Walking_Upstairs", 
+                              
+                              ifelse(HumanActivity$Activity == 3, "Walking_Downstairs", 
+                                    
+                                    ifelse(HumanActivity$Activity == 4, "Sitting",
+                                           
+                                           ifelse(HumanActivity$Activity == 5, "Standing", "Laying")
+                                     
+                                     ))))
 
 **Next we want to find the mean for each variable grouped by the ID and Activity 
 First, we need to make sure the df is in numeric form.**
